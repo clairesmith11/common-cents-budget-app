@@ -1,0 +1,45 @@
+.BudgetItems {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.BudgetItemsAmount {
+    display: flex;
+    align-items: center;
+}
+
+.BudgetItems p {
+    font-size: .8rem;
+    font-weight: bold;
+
+}
+
+.BudgetItems p.inc {
+    color: green;
+}
+
+.BudgetItems p.exp {
+    color: red;
+}
+
+.BudgetItems button {
+    border-radius: 50%;
+    height: 25px;
+    width: 25px;
+    background-color: goldenrod;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    border: none;
+    margin-left: 15px;
+}
+
+.BudgetItems button:hover {
+    background-color: darkgoldenrod;
+}
+
+.BudgetItems button:active {
+    transform: scale(.9);
+}

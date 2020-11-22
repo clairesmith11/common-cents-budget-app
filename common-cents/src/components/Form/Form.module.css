@@ -1,0 +1,50 @@
+.BudgetForm {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2rem .5rem;
+}
+
+.BudgetForm label {
+    font-size: 1rem;
+    margin-right: .5rem;
+}
+
+.BudgetForm input, select {
+    margin-right: 1.3rem;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.BudgetForm input[type="text"] {
+    width: 12rem;
+}
+
+.BudgetForm input[type="radio"] {
+    margin: 3px;
+    width: 7px;
+}
+
+.BudgetForm input[type="submit"], button {
+    padding: 10px;
+    outline: 0;
+    border: 1px solid rgba(4,3,63,1);
+    background-color: goldenrod;
+    margin: 0 2rem;
+    width: 7.5rem;
+    border-radius: 5px;
+}
+
+.BudgetForm input[type="submit"]:hover, button:hover {
+    background-color: darkgoldenrod;
+}
+
+.BudgetForm input[type="submit"]:active, button:active {
+    transform: scale(.9);
+}
+
+.BudgetForm input[type="number"]:focus {
+    outline: none;
+    width: 7.5rem;
+}

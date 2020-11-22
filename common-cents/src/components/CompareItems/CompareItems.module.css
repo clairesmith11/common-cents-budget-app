@@ -1,0 +1,26 @@
+.CompareItems {
+    margin-left: 3rem;
+    margin-right: 3rem;
+    border: 3px solid goldenrod;
+    padding: 1rem;
+    text-align: left;
+    width: 25%;
+    border-radius: 5px;
+}
+
+.CompareItems select {
+    width: 100%;
+    
+}
+
+.CompareItems h3 {
+    font-size: 1rem;
+}
+
+.CompareItems p {
+    border-bottom: 1px solid black;
+    font-size: .9rem;
+    display: flex;
+    justify-content: space-between;
+}
+

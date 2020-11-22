@@ -1,0 +1,43 @@
+.topnav {
+    overflow: hidden;
+    position: relative;
+    border-bottom: 2px solid rgba(4,3,63,1);
+    box-shadow: 0 1px 15px 1px #ccc;
+  }
+
+  .topnav img {
+      height: 75px;
+      width: auto;
+      
+  }
+  
+  .topnav .hide {
+    display: none;
+  }
+
+  .topnav .show {
+    display: block;
+  }
+  
+  .topnav a {
+    color: goldenrod;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+    display: block;
+  }
+  
+  .icon {
+    display: block;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    cursor: pointer;
+  }
+  
+  .topnav a:hover {
+    background-color: #ddd;
+    color: black;
+  }
+  
+ 

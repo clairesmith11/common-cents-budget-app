@@ -1,0 +1,24 @@
+progress {
+    width: 15rem;
+    margin: 5px auto;
+}
+
+progress[value] {
+    -webkit-appearance: none;
+       -moz-appearance: none;
+            appearance: none;
+    border: none;
+    border-radius: 5px;
+    
+}
+
+progress[value]::-moz-progress-bar { 
+    background-color: goldenrod;
+    border-radius: 5px;  
+  }
+
+.Over[value]::-moz-progress-bar { 
+    background-color:red;
+    border-radius: 5px;  
+  }
+  

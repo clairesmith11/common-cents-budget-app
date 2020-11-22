@@ -1,0 +1,67 @@
+.BackdropShown {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0,0,0,0.7);
+    opacity: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.BackdropHidden {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.ModalShown {
+    width: 50vw;
+    height: 60vh;
+    background-color: #eee;
+    transform: translateY(0);
+    transition: transform .3s ease-in;
+    padding: 3rem 2rem;
+    border-radius: 5px;
+    box-shadow: 15px 15px 10px rgba(0,0,0,0.5);
+}
+
+.ModalHidden {
+    transform: translateY(-100vh);
+   
+}
+
+.ModalShown h2 {
+    color: goldenrod;
+    font-size: 2rem;
+    display: inline-block;
+    margin-bottom: 1rem;
+}
+
+.ModalShown h3 {
+    font-size: 1.3rem;
+    display: block;
+    margin-bottom: 3rem;
+}
+
+p {
+    font-size: 1rem;
+    display: block;
+    margin-bottom: 1.5rem;
+}
+
+.ModalShown span {
+    font-weight: bold;
+    border: 1px solid black;
+    margin: 5px;
+    padding: 5px;
+    border-radius: 5px;
+    text-transform: capitalize;
+}
+
+
+.ModalShown button {
+    margin-top: 2rem;
+}
