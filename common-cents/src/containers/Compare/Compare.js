@@ -1,29 +1,47 @@
 import React, { Component } from 'react';
 import CompareItems from '../../components/CompareItems/CompareItems';
 import classes from './Compare.module.css';
-import axios from '../../axios-budget'
+import axios from '../../axios-budget';
+import { connect } from 'react-redux';
+import * as actionTypes from '../../store/actions/actionTypes';
 
 class Compare extends Component {
     state= {
         budget1: null,
         budget2: null,
-        totalDifference: null
+        totalDifference: null,
+        error: false
     }
 
-    fetchMonthBudget = (month, id) => {
-        axios.get(`/${month}.json`)
+    componentDidMount() {
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('userId');
+        const userName = localStorage.getItem('userName');
+        if (token) {
+            this.props.onAutoSignIn(token, userId, userName)
+        }
+    }
+
+    fetchMonthBudget = (month, id, token, userId) => {
+        this.setState({error: null})
+        const queryParams = '?auth=' + token + '&orderBy="userId"&equalTo="' + userId + '"';
+        axios.get(`/${month}.json` + queryParams)
             .then(res => {
+                console.log(res.data)
                 const fetchedBudget = []
                 for (let key in res.data) {
                     fetchedBudget.push({
-                        ...res.data[key],
+                        ...res.data.[key].budget,
                         id: key,
                         month: month
                     })
                 }
                 this.setState({[id]: fetchedBudget})
                 
-    })
+            })
+            .catch(error => {
+                this.setState({error: error.response.data.error})
+            })
 }
 
     calculateBudget = () => {
@@ -51,18 +69,28 @@ class Compare extends Component {
         } else {
             compareStatement = '';
         }
+        let errorMessage = null;
+        
+        if (this.state.error === 'Could not parse auth token.') {
+            errorMessage = <p className={classes.error}>Please sign up or log in to continue.</p>
+        } else if (this.state.error === 'Permission denied') {
+            errorMessage = <p className={classes.error}>You do not have any saved data for this month.</p>
+        }
+        
+
         return (
             <div>
+                {errorMessage}
                 <div className={classes.CompareContainer}>
-                <CompareItems 
-                    changed={(e) => this.fetchMonthBudget(e.target.value, 'budget1')}
-                    value={this.state.budget1}/>
-                <CompareItems 
-                    changed={(e) => this.fetchMonthBudget(e.target.value, 'budget2')}
-                    value={this.state.budget2}/>
+                    <CompareItems 
+                        changed={(e) => this.fetchMonthBudget(e.target.value, 'budget1', this.props.token, this.props.userId)}
+                        value={this.state.budget1}/>
+                    <CompareItems 
+                        changed={(e) => this.fetchMonthBudget(e.target.value, 'budget2', this.props.token, this.props.userId)}
+                        value={this.state.budget2}/>
                     
                 </div>
-                <button onClick={this.calculateBudget}>Calculate</button>
+                <button className={classes.compareButton} onClick={this.calculateBudget}>Calculate</button>
                 {compareStatement}
             </div>
             
@@ -71,4 +99,21 @@ class Compare extends Component {
     }
 }
 
-export default Compare;
+const mapStateToProps = state => {
+    return {
+        token: state.token,
+        userId: state.userId
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        onAutoSignIn: (token, userId, userName) => dispatch({
+            type: actionTypes.AUTOSIGNIN, 
+            token: token,
+            userId: userId,
+            userName: userName})
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Compare);

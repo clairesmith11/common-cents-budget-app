@@ -28,16 +28,33 @@
   }
   
   .icon {
-    display: block;
+    display: flex;
     position: absolute;
     right: 20px;
     top: 20px;
+  }
+
+  .bars {
+    margin-left: 1.5rem;
     cursor: pointer;
   }
+
+  .user {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
   
+  .user p {
+    font-size: .65rem;
+    margin-top: .15rem;
+  }
+
   .topnav a:hover {
     background-color: #ddd;
     color: black;
   }
   
- 
+ .show button {
+   margin-bottom: 1.5rem;
+ }

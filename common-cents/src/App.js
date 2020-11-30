@@ -6,6 +6,7 @@ import Compare from './containers/Compare/Compare';
 import Auth from './containers/Auth/Auth';
 import { BrowserRouter, Route } from 'react-router-dom';
 
+
 function App() {
   return (
     <BrowserRouter>

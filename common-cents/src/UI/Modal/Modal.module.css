@@ -65,3 +65,15 @@ p {
 .ModalShown button {
     margin-top: 2rem;
 }
+
+.error {
+    color: red
+}
+
+.success {
+    color: green;
+}
+
+.fa-pulse {
+    display: block;
+}

@@ -14,7 +14,7 @@ const CompareItems = props => {
                 <option value="June">June</option>
                 <option value="July">July</option>
                 <option value="August">August</option>
-                <option value="September">Septemer</option>
+                <option value="September">September</option>
                 <option value="October">October</option>
                 <option value="November">November</option>
                 <option value="December">December</option>

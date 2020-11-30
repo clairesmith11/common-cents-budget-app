@@ -4,6 +4,9 @@ import BudgetCategory from '../../components/BudgetCategory/BudgetCategory';
 import Modal from '../../UI/Modal/Modal';
 import Form from '../../components/Form/Form';
 import axios from '../../axios-budget';
+import { connect } from 'react-redux';
+import * as actionTypes from '../../store/actions/actionTypes';
+
 
 class Budget extends Component {
     state = {
@@ -24,8 +27,35 @@ class Budget extends Component {
         entertainmentSubtotal: 0,
         vacationSubtotal: 0,
         total: 0,
-        submitting: false
+        submitting: false,
+        error: false,
+        success: false,
+        loading: false
     }
+
+    componentDidMount() {
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('userId');
+        const userName = localStorage.getItem('userName');
+        const appState = JSON.parse(localStorage.getItem('appState'))
+        if (token) {
+            this.props.onAutoSignIn(token, userId, userName)
+        }
+        if (appState !== null) {
+            this.setState({budget: appState.budget})
+            this.setState({incomeSubtotal: appState.incomeSubtotal})
+            this.setState({housingSubtotal: appState.housingSubtotal})
+            this.setState({utilitiesSubtotal: appState.utilitiesSubtotal})
+            this.setState({groceriesSubtotal: appState.groceriesSubtotal})
+            this.setState({debtSubtotal: appState.debtSubtotal})
+            this.setState({entertainmentSubtotal: appState.entertainmentSubtotal})
+            this.setState({vacationSubtotal: appState.vacationSubtotal})
+            this.setState({total: appState.total})
+        }
+        
+    }
+
+    
 
     addTransactionHandler = (e) => {
         e.preventDefault();
@@ -46,14 +76,25 @@ class Budget extends Component {
             ...this.state.budget,
             [key]: this.state.budget.[key].concat(submittedTransaction)
         }
-        this.setState({budget: updatedBudget});
-        this.setState({total: this.state.total + submittedTransaction.amount});
-        this.setState({[key2]: this.state.[key2] + submittedTransaction.amount})
+        this.setState({
+                        budget: updatedBudget,
+                        total: this.state.total + submittedTransaction.amount,
+                        [key2]: this.state.[key2] + submittedTransaction.amount
+                    }, this.saveToLocal);
+        
         document.getElementById('transaction').value = '';
         document.getElementById('amount').value = '';
+        
+        
+    }
+
+    saveToLocal() {
+        const local = this.state;
+        localStorage.setItem('appState', JSON.stringify(local));
     }
 
     removeTransactionHandler = (id, category) => {
+        localStorage.removeItem('appState')
         const subtotal = category + 'Subtotal';
         const deletedItem = this.state.budget.[category].filter(item => item.id === id);
         const deletedArray = this.state.budget.[category].filter(item => item.id !== id);
@@ -64,15 +105,23 @@ class Budget extends Component {
         }
         this.setState({budget: deletedBudget,
                         total: this.state.total - deletedItem[0].amount,
-                        [subtotal]: this.state.[subtotal] - deletedItem[0].amount})
+                        [subtotal]: this.state.[subtotal] - deletedItem[0].amount},
+                        this.saveToLocal)
+        
+        
                    
     }
 
     completeMonthHandler = () => {
-        this.setState({submitting: !this.state.submitting})
+        this.setState({
+                        submitting: !this.state.submitting, 
+                        error: null, 
+                        success: null
+                    })
+        
     }
 
-    submitMonthHandler = () => {
+    submitMonthHandler = (token) => {
         const budget = {
             total: this.state.total,
             income: this.state.incomeSubtotal,
@@ -83,14 +132,25 @@ class Budget extends Component {
             entertainment: this.state.entertainmentSubtotal,
             vacation: this.state.vacationSubtotal
         }
+        const submission = {
+            budget: budget,
+            userId: this.props.userId 
+        }
         const date = new Date();
-        const month = 10;
+        const month = 6;
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-        axios.post(`/${months[month]}.json`, budget)
-            .then(res => console.log(res))
-            .catch(error => console.log(error));
+        this.setState({loading: true})
+        axios.post(`/${months[month]}.json?auth=${token}`, submission)
+            .then(res => {
+                this.setState({success: true, loading: false})
+                localStorage.removeItem('appState')
+            })
+            .catch(error => {
+                console.log(error);
+                this.setState({error: true, loading: false});
+            })
         
-        this.setState({submitting: false})
+        
     }
 
 
@@ -125,15 +185,19 @@ class Budget extends Component {
             {category: 'entertainment', amount: this.state.entertainmentSubtotal},
             {category: 'vacation', amount: this.state.vacationSubtotal}
         ]
+
         
         return (
             <div className={classes.Budget}>
                 <Modal 
                     show={this.state.submitting} 
                     close={this.completeMonthHandler} 
-                    submit={this.submitMonthHandler}
+                    submit={() => this.submitMonthHandler(this.props.token)}
                     total={this.state.total}
-                    subtotals={subtotals}/>
+                    subtotals={subtotals}
+                    error={this.state.error}
+                    success={this.state.success}
+                    loading={this.state.loading}/>
                 <div className={classes.BudgetHeading}>
                     <h2>{months[date.getMonth()] + ' ' + date.getFullYear()}</h2>
                     <p>Monthly Total</p>
@@ -149,4 +213,21 @@ class Budget extends Component {
     }
 }
 
-export default Budget;
+const mapStateToProps = state => {
+    return {
+        token: state.token,
+        userId: state.userId
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        onAutoSignIn: (token, userId, userName) => dispatch({
+            type: actionTypes.AUTOSIGNIN, 
+            token: token,
+            userId: userId,
+            userName: userName})
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Budget);

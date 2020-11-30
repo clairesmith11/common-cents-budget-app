@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
+import { Redirect } from 'react-router-dom';
 import classes from './Auth.module.css';
 import axios from 'axios';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { connect } from 'react-redux';
+import * as actionTypes from '../../store/actions/actionTypes';
 
 class Auth extends Component {
     state = {
@@ -19,11 +23,13 @@ class Auth extends Component {
             }
 
         },
-        signIn: false
+        loggingIn: false,
+        loading: false,
+        error: null
     }
 
     switchSignInHandler = () => {
-        this.setState({signIn: !this.state.signIn})
+        this.setState({loggingIn: !this.state.loggingIn})
     }
 
     onInputChangeHandler = (e, controlName) => {
@@ -37,19 +43,30 @@ class Auth extends Component {
         this.setState({controls: updatedControls})
     }
 
-    onSignIn = (e, email, password) => {
+    signInHandler = (e, email, password) => {
         e.preventDefault();
         const authData = {
             email: email,
             password: password,
             returnSecureToken: true
         }
-        axios.post('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCMjt2Tvr3AzP1099hZ5MdOvmUAd3RY3w4', authData)
+        let url = '';
+        if (this.state.loggingIn) {
+            url = 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCMjt2Tvr3AzP1099hZ5MdOvmUAd3RY3w4'
+        } else {
+            url = 'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCMjt2Tvr3AzP1099hZ5MdOvmUAd3RY3w4'
+        }
+        this.setState({loading: true})
+        axios.post(url, authData)
             .then(response => {
-                console.log(response)
+                this.setState({loading: false});
+                localStorage.setItem('token', response.data.idToken);
+                localStorage.setItem('userId', response.data.localId);
+                localStorage.setItem('userName', response.data.email);
+                this.props.onSignIn(response.data.email, response.data.idToken, response.data.localId);
             })
             .catch(error => {
-                console.log(error)
+                this.setState({loading: false, error: error.response.data.error.message})
             })
         const updatedControls = {
             ...this.state.controls,
@@ -83,19 +100,59 @@ class Auth extends Component {
                     onChange={(e) => this.onInputChangeHandler(e, element.id)}>
                 </input>)
         })
+        let icon = this.state.loading 
+            ? <FontAwesomeIcon icon={faSpinner} className="fa-pulse" size="4x" /> 
+            : <FontAwesomeIcon icon={faUser} size="4x" />;
+        
+            let errorMessage = null;
+
+            if (this.state.error === 'EMAIL_EXISTS') {
+                errorMessage = <p className={classes.error}>An account with this email already exists. Please log in.</p>
+            } else if (this.state.error === 'INVALID_EMAIL') {
+                errorMessage = <p className={classes.error}>The email is invalid.</p>
+            } else if (this.state.error === 'INVALID_PASSWORD') {
+                errorMessage = <p className={classes.error}>The password is incorrect. Password must be at least 6 characters.</p>
+            } else if (this.state.error === 'EMAIL_NOT_FOUND') {
+                errorMessage = <p className={classes.error}>There is no account for this email address.</p>
+            }
+        
+        let authRedirect = null;
+
+        if (this.props.isAuth) {
+            authRedirect = <Redirect to="/" />
+        }
+        
         return (
             <div>
+                {authRedirect}
                 <form className={classes.Auth}>
-                    <FontAwesomeIcon icon={faUser} size="4x" />
+                    {icon}
                     {form}
+                    {errorMessage}
                     <button 
-                        onClick={(e) => this.onSignIn(e, this.state.controls.email.value, this.state.controls.password.value)}>
-                            {this.state.signIn ? 'Log in' : 'Sign up'}</button>
-                    <p onClick={this.switchSignInHandler}>{this.state.signIn ? 'Sign up' : 'Log in'}</p>
+                        onClick={(e) => this.signInHandler(e, this.state.controls.email.value, this.state.controls.password.value)}>
+                            {this.state.loggingIn ? 'Log in' : 'Sign up'}</button>
+                    <p className={classes.signin} onClick={this.switchSignInHandler}>{this.state.loggingIn ? 'Sign up' : 'Log in'}</p>
                 </form>
             </div>
         )
     }
 }
 
-export default Auth;
+const mapStateToProps = state => {
+    return {
+        isAuth: state.token !== null
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        onSignIn: (userName, token, userId) => dispatch({
+            type: actionTypes.SIGNIN, 
+            userName: userName,
+            token: token,
+            userId: userId})
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Auth);
