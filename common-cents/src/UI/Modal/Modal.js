@@ -5,6 +5,14 @@ import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 
 
 class Modal extends Component {
+    shouldComponentUpdate(nextProps, nextState) {
+        if(nextProps.show !== this.props.show || nextProps.children !== this.props.children) {
+            console.log('updating modal...')
+            return true;
+        } else {
+            return false
+        }
+    };
 
     render () {
         const message = this.props.total > 0 ? <h2>Congratulations!</h2> : <h2>Sorry!</h2>

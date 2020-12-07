@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import classes from './Navigation.module.css';
 import Logo from '../../assets/logo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -8,45 +8,42 @@ import { Link, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import * as actionTypes from '../../store/actions/actionTypes';
 
-class Navigation extends Component {
-    state = {
-        showing: false
+const Navigation = props => {
+    const [showing, setShowing] = useState(false);
+
+    const showNavPanel = () => {
+        setShowing(!showing);
     }
 
-    showNavPanel = () => {
-        this.setState({showing: !this.state.showing})
-    }
-
-    logoutHandler = () => {
+    const logoutHandler = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
         localStorage.removeItem('userName');
-        this.props.onLogout();
-        this.showNavPanel();
-        this.setState({showing: false})
+        props.onLogout();
+        showNavPanel();
+        setShowing(false);
         localStorage.removeItem('appState');
     }
 
-    render () {
-        const user = this.props.isAuth ? 
+        const user = props.isAuth ? 
         (<div className={classes.user}>
             <FontAwesomeIcon icon={faUser} size="2x" />
-            <p>{this.props.userName}</p>
+            <p>{props.userName}</p>
         </div>) 
         : null;
 
-        const logoutLink = this.props.isAuth ?
-            <Link to="/sign-in" onClick={this.logoutHandler}>Logout</Link> 
+        const logoutLink = props.isAuth ?
+            <Link to="/sign-in" onClick={logoutHandler}>Logout</Link> 
             : null;
 
         return (
             <div className={classes.topnav}>
                 <img src={Logo} alt="Logo"/>
-                    <div className={this.state.showing ? classes.show : classes.hide}>
-                        <Link to="/" onClick={this.showNavPanel}>My Budget</Link>
-                        <Link to="/compare" onClick={this.showNavPanel}>Compare</Link>
-                        {!this.props.isAuth 
-                            ? <Link to="/sign-in" onClick={this.showNavPanel}>Sign In</Link>
+                    <div className={showing ? classes.show : classes.hide}>
+                        <Link to="/" onClick={showNavPanel}>My Budget</Link>
+                        <Link to="/compare" onClick={showNavPanel}>Compare</Link>
+                        {!props.isAuth 
+                            ? <Link to="/sign-in" onClick={showNavPanel}>Sign In</Link>
                             : null}
                         {logoutLink}
                     </div>
@@ -55,14 +52,14 @@ class Navigation extends Component {
                     <FontAwesomeIcon 
                         icon={faBars} 
                         className={classes.bars}
-                        onClick={this.showNavPanel} 
+                        onClick={showNavPanel} 
                         size="2x" />
                 </div>
           </div>
             
             
         )
-    }
+    
     
 }
 

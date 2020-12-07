@@ -14,6 +14,12 @@
     padding: 10px;
 }
 
+@media(max-width: 750px) {
+    .BudgetHeading {
+        width: 90%;
+    }
+}
+
 .BudgetHeading h2 {
     font-size: 1.3rem;
     margin-right: 10px;

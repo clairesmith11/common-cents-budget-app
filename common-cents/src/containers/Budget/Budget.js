@@ -168,6 +168,7 @@ class Budget extends Component {
             const subtotal = element.id + 'Subtotal' 
             return (
                 <BudgetCategory
+                    key={Math.random()}
                     category={element.id}
                     subtotal={this.state.[subtotal]}
                     total={this.state.total}
