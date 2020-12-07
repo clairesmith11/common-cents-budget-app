@@ -62,8 +62,7 @@ class Budget extends Component {
         const form = document.querySelector('form');
         if (form.elements[0].value === '' ||
             form.elements[1].value === '' ||
-            form.elements[2].value === '' || 
-            !form.elements[3].checked) {
+            form.elements[2].value === '' ) {
             alert('Please complete all form fields!')
         } else {
             const amount = form.elements[2].value;

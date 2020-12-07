@@ -10,7 +10,7 @@ class Compare extends Component {
         budget1: null,
         budget2: null,
         totalDifference: null,
-        error: false
+        error: ''
     }
 
     componentDidMount() {
@@ -36,7 +36,12 @@ class Compare extends Component {
                         month: month
                     })
                 }
-                this.setState({[id]: fetchedBudget})
+                if (fetchedBudget.length > 0) {
+                    this.setState({[id]: fetchedBudget})
+                } else {
+                    this.setState({error: 'You do not have any saved data for this month'})
+                }
+                
                 
             })
             .catch(error => {
@@ -74,6 +79,8 @@ class Compare extends Component {
         if (this.state.error === 'Could not parse auth token.') {
             errorMessage = <p className={classes.error}>Please sign up or log in to continue.</p>
         } else if (this.state.error === 'Permission denied') {
+            errorMessage = <p className={classes.error}>You do not have any saved data for this month.</p>
+        } else {
             errorMessage = <p className={classes.error}>You do not have any saved data for this month.</p>
         }
         
