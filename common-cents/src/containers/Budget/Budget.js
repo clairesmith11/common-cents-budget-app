@@ -60,32 +60,36 @@ class Budget extends Component {
     addTransactionHandler = (e) => {
         e.preventDefault();
         const form = document.querySelector('form');
-        const amount = form.elements[2].value;
-        const submittedTransaction = {
-            category: form.elements[0].value,
-            name: form.elements[1].value,
-            amount: form.elements[3].checked ? parseFloat(amount) : parseFloat(amount) * -1,
-            income: form.elements[3].checked,
-            expense: form.elements[4].checked,
-            id: Math.random() * 1000
-
+        if (form.elements[0].value === '' ||
+            form.elements[1].value === '' ||
+            form.elements[2].value === '' || 
+            !form.elements[3].checked) {
+            alert('Please complete all form fields!')
+        } else {
+            const amount = form.elements[2].value;
+            const submittedTransaction = {
+                category: form.elements[0].value,
+                name: form.elements[1].value,
+                amount: form.elements[3].checked ? parseFloat(amount) : parseFloat(amount) * -1,
+                income: form.elements[3].checked,
+                expense: form.elements[4].checked,
+                id: Math.random() * 1000
+            }
+            const key = submittedTransaction.category
+            const key2 = submittedTransaction.category + 'Subtotal';
+            const updatedBudget = {
+                ...this.state.budget,
+                [key]: this.state.budget.[key].concat(submittedTransaction)
+            }
+            this.setState({
+                            budget: updatedBudget,
+                            total: this.state.total + submittedTransaction.amount,
+                            [key2]: this.state.[key2] + submittedTransaction.amount
+                        }, this.saveToLocal);
+        
+            document.getElementById('transaction').value = '';
+            document.getElementById('amount').value = '';
         }
-        const key = submittedTransaction.category
-        const key2 = submittedTransaction.category + 'Subtotal';
-        const updatedBudget = {
-            ...this.state.budget,
-            [key]: this.state.budget.[key].concat(submittedTransaction)
-        }
-        this.setState({
-                        budget: updatedBudget,
-                        total: this.state.total + submittedTransaction.amount,
-                        [key2]: this.state.[key2] + submittedTransaction.amount
-                    }, this.saveToLocal);
-        
-        document.getElementById('transaction').value = '';
-        document.getElementById('amount').value = '';
-        
-        
     }
 
     saveToLocal() {
@@ -106,10 +110,7 @@ class Budget extends Component {
         this.setState({budget: deletedBudget,
                         total: this.state.total - deletedItem[0].amount,
                         [subtotal]: this.state.[subtotal] - deletedItem[0].amount},
-                        this.saveToLocal)
-        
-        
-                   
+                        this.saveToLocal)          
     }
 
     completeMonthHandler = () => {
@@ -117,8 +118,7 @@ class Budget extends Component {
                         submitting: !this.state.submitting, 
                         error: null, 
                         success: null
-                    })
-        
+                    }); 
     }
 
     submitMonthHandler = (token) => {
@@ -137,7 +137,7 @@ class Budget extends Component {
             userId: this.props.userId 
         }
         const date = new Date();
-        const month = 6;
+        const month = 7;
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
         this.setState({loading: true})
         axios.post(`/${months[month]}.json?auth=${token}`, submission)
@@ -148,12 +148,9 @@ class Budget extends Component {
             .catch(error => {
                 console.log(error);
                 this.setState({error: true, loading: false});
-            })
-        
-        
+            });   
     }
-
-
+    
     render () {
         let date = new Date();
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']

@@ -6,7 +6,12 @@ import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 
 class Modal extends Component {
     shouldComponentUpdate(nextProps, nextState) {
-        if(nextProps.show !== this.props.show || nextProps.children !== this.props.children) {
+        if(
+            nextProps.show !== this.props.show || 
+            nextProps.error !== this.props.error ||
+            nextProps.success !== this.props.success ||
+            nextProps.children !== this.props.children
+            ) {
             console.log('updating modal...')
             return true;
         } else {
